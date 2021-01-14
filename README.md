@@ -12,20 +12,33 @@ Django instrections
 install doker :https://www.docker.com/get-started
 
 mkdir drf-api
+
 cd drf-api
+
 poetry init -n
+
 poetry add django djangorestframework
+
 poetry shell
+
 django-admin startproject healthProject .
+
 python manage.py migrate
+
 python manage.py startapp health
+
 python manage.py createsuperuser
+
 python manage.py runserver
+
 in the settings.py ---> INSTALLED_APPS --->add the app to project applications 'health.apps.healthConfig',
+
 go to health/models.py ---->
+
 from django.contrib.auth import get_user_model
+
 from django.db import models
-```
+```python
 class Healths(models.Model):
     author = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
     title = models.CharField(max_length=64)
@@ -97,6 +110,7 @@ urlpatterns = [
     path('<int:pk>/', HealthDetails.as_view(), name='Health_details') 
 ]
 ```
+```
 python manage.py runserver
 in root create Dockerfile inside it write:
 FROM python:3
@@ -107,9 +121,11 @@ WORKDIR /code
 COPY requirements.txt /code/
 RUN pip install -r requirements.txt
 COPY . /code/
+```
 in root create docker-compose.yml inside it write:
-version: '3'
 
+version: '3'
+```python 
 services:
   web:
     build: .
@@ -118,24 +134,39 @@ services:
       - .:/code
     ports:
       - "8000:8000"
-
+```
 in the settings.py --->add ALLOWED_HOSTS = ['0.0.0.0',]
+
 python manage.py runserver 0.0.0.0:8000
+
 poetry export -f requirements.txt -o requirements.txt
+
 open docker
+
 docker-compose up
+
 if it didnt work:
 open docker-->dashboard --->start--->open in window settings#ALLOWED_HOSTS = ['0.0.0.0','localhost','127.0.0.1']
 or try:
+
 docker-compose down
+
 docker-compose build
+
 docker-compose up
+
 permissions
+
 poetry shell
+
 poetry install
+
 python run server
+
 python run server
 go settings.py edit :
+
+```python 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASS': [
         'rest_framework.permissions.IsAuthenticated',
@@ -152,13 +183,23 @@ class IsAuthorOrReadOnly(permissions.BasePermission):
 
 
         return obj.author == request.user
+
+```
 go to health/views.py add:
+
 from .permissions import IsAuthorOrReadOnly
-#to class HealthDetails add:
+
+# to class HealthDetails add:
+
 permission_classes = (IsAuthorOrReadOnly,)
+
 python manage.py runserver
+
 postgres
+
 go to settings.py :
+
+```python
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -169,7 +210,10 @@ DATABASES = {
         'PORT': 5432,
     }
 }
+```
 editdocker-compose.yml :
+
+```
 version: '3'
 
 services:
@@ -186,21 +230,39 @@ services:
       image: postgres:11
       environment:
           - "POSTGRES_HOST_AUTH_METHOD=trust"
-poetry add psycopg2
+
+```
+poetry add psycopg2 and psycopg2-binary
+
 poetry export -f requirements.txt -o requirements.txt
+
 exit poetry
+
 docker-compose run web python manage.py makemigrations
+
 docker-compose run web python manage.py migrate
+
 docker-compose run web python manage.py createsuperuser
+
 docker-compose up
+
 to run test :
+
 docker-compose run web python manage.py test
-tokens
+
+**tokens**
+
 poetry add djangorestframework_simplejwt make sure to change pyproject.toml--> python = "~3.8"
+
 poetry add gunicorn # Running Django in Gunicorn as a generic WSGI application/to run production mode
+
 poetry add whitenoise# allows your web app to serve its own static files, making it a self-contained
+
 poetry export -f requirements.txt -o requirements.txt
 go to settings.py add:
+
+
+```python
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -210,16 +272,24 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.BasicAuthentication',
     ]
+
 }
+```
+
 go to healthProject/urls.pyadd :
 from rest_framework_simplejwt import views as jwt_views
 #in urlpatterns add:
+
+```python
     path('api/token/', jwt_views.TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', jwt_views.TokenRefreshView.as_view(), name='token_refresh'),
+```
 in docker-compose.yml edit :
 version: '3.8'
 command: gunicorn healthProject.wsgi:application --bind 0.0.0.0:8000 --workers 4
 in settings add:# to add css
+
+```python
 import os
 STATIC_DIR = os.path.join(BASE_DIR, 'static')
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -227,7 +297,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
+```
+
 in settings add:# to add css
+```python
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -243,7 +316,8 @@ INSTALLED_APPS = [
 
     
 ]
-
+```
+```python
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -254,6 +328,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+```
 docker-compose up --build
 
 click inspect --> application-->you can find ur taken
