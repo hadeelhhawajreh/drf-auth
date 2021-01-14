@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "drf-api"
+version = "0.1.0"
+description = ""
+authors = ["Hadeel H Al-Hawajreh <hadeelhhawajreh@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^3.1.5"
+djangorestframework = "^3.12.2"
+docker = "^4.4.1"
+docker-compose = "^1.27.4"
+psycopg2-binary = "^2.8.6"
+psycopg2 = "^2.8.6"
+postgres = "^3.0.0"
+djangorestframework-simplejwt = "^4.6.0"
+httpie = "^2.3.0"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+autopep8 = "^1.5.4"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
